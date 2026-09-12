@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Sprout, Menu, X, ArrowRight, Sun, Moon } from 'lucide-react';
+import { Sprout, Menu, X, Sun, Moon } from 'lucide-react';
 
 export default function Navbar({ activePage, setActivePage, theme, toggleTheme }) {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -13,6 +13,7 @@ export default function Navbar({ activePage, setActivePage, theme, toggleTheme }
   return (
     <nav className="navbar">
       <div className="app-container nav-inner">
+        {/* Brand Logo */}
         <div className="brand-logo" onClick={() => handleNavigate('home')}>
           <div className="brand-icon">
             <Sprout size={20} />
@@ -20,7 +21,7 @@ export default function Navbar({ activePage, setActivePage, theme, toggleTheme }
           <span>CropMitra</span>
         </div>
 
-        {/* Desktop Navigation */}
+        {/* Desktop Navigation Links & Theme Toggle */}
         <ul className="nav-links">
           <li>
             <span
@@ -54,7 +55,7 @@ export default function Navbar({ activePage, setActivePage, theme, toggleTheme }
               About
             </span>
           </li>
-          <li>
+          <li style={{ display: 'flex', alignItems: 'center' }}>
             <button
               className="theme-toggle-btn"
               onClick={toggleTheme}
@@ -64,19 +65,10 @@ export default function Navbar({ activePage, setActivePage, theme, toggleTheme }
               {theme === 'dark' ? <Sun size={19} /> : <Moon size={19} />}
             </button>
           </li>
-          <li>
-            <button
-              className="btn btn-primary"
-              onClick={() => handleNavigate('advisor')}
-            >
-              <span>Get Recommendation</span>
-              <ArrowRight size={16} />
-            </button>
-          </li>
         </ul>
 
         {/* Mobile Hamburger Button */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+        <div className="mobile-controls">
           <button
             className="mobile-menu-btn"
             onClick={() => setMobileOpen(!mobileOpen)}
@@ -122,7 +114,7 @@ export default function Navbar({ activePage, setActivePage, theme, toggleTheme }
               About
             </span>
           </li>
-          <li style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.65rem 0.5rem' }}>
+          <li style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.65rem 0.5rem', borderTop: '1px solid var(--color-border)', marginTop: '0.5rem' }}>
             <span style={{ fontSize: '1rem', fontWeight: 600, color: 'var(--color-text-muted)' }}>
               Theme ({theme === 'dark' ? 'Dark' : 'Light'})
             </span>
@@ -132,15 +124,6 @@ export default function Navbar({ activePage, setActivePage, theme, toggleTheme }
               aria-label="Toggle theme"
             >
               {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
-            </button>
-          </li>
-          <li style={{ marginTop: '0.5rem' }}>
-            <button
-              className="btn btn-primary btn-block"
-              onClick={() => handleNavigate('advisor')}
-            >
-              <span>Get Recommendation</span>
-              <ArrowRight size={16} />
             </button>
           </li>
         </ul>

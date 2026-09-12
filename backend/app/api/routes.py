@@ -38,13 +38,18 @@ def get_districts(state: str = Query(..., description="Selected state name")):
         return [state]
     return districts
 
-@router.get("/locations/crops", response_model=List[str])
+@router.get("/locations/crops")
 def get_location_crops(
     state: str = Query(..., description="Selected state"),
     district: str = Query(..., description="Selected district")
 ):
     """Returns crops historically registered or supported for the selected location."""
-    return location_service.get_location_crops(state, district)
+    crops = location_service.get_location_crops(state, district)
+    return {
+        "state": state,
+        "district": district,
+        "crops": crops
+    }
 
 # ----------------- CROPS & RECOMMENDATION -----------------
 

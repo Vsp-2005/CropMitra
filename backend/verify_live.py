@@ -30,11 +30,15 @@ def verify_all_v2():
         assert len(districts) >= 10
         print(f"[PASS] /api/locations/districts (Maharashtra) returned {len(districts)} districts: {districts[:5]}")
 
-    print("\n--- 5. Verifying /api/locations/crops?state=Maharashtra&district=Pune ---")
-    with urllib.request.urlopen('http://127.0.0.1:8000/api/locations/crops?state=Maharashtra&district=Pune') as resp:
-        pune_crops = json.loads(resp.read().decode('utf-8'))
-        assert isinstance(pune_crops, list)
-        print(f"[PASS] /api/locations/crops (Pune, Maharashtra) returned: {pune_crops}")
+    print("\n--- 5. Verifying /api/locations/crops?state=Maharashtra&district=Kolhapur ---")
+    with urllib.request.urlopen('http://127.0.0.1:8000/api/locations/crops?state=Maharashtra&district=Kolhapur') as resp:
+        data = json.loads(resp.read().decode('utf-8'))
+        crops = data['crops'] if isinstance(data, dict) else data
+        assert isinstance(crops, list)
+        assert "Sugarcane" in crops
+        assert "Soybean" in crops
+        assert "Rice" in crops
+        print(f"[PASS] /api/locations/crops (Kolhapur, Maharashtra) returned {len(crops)} crops: {crops}")
 
     print("\n--- 6. Verifying /api/recommend (Maharashtra + Pune) ---")
     req = urllib.request.Request(

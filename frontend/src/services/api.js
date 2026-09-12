@@ -56,9 +56,13 @@ export const api = {
    * Fetch crops registered for a location
    */
   async getLocationCrops(state, district) {
+    if (!state || !district) return [];
     try {
       const res = await fetch(`${API_BASE_URL}/api/locations/crops?state=${encodeURIComponent(state)}&district=${encodeURIComponent(district)}`);
-      return await handleResponse(res);
+      const data = await handleResponse(res);
+      if (Array.isArray(data)) return data;
+      if (data && Array.isArray(data.crops)) return data.crops;
+      return [];
     } catch (err) {
       console.error('Failed to fetch location crops:', err);
       return [];

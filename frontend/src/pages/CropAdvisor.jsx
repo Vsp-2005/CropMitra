@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { 
   Sprout, 
   Droplets, 
@@ -39,17 +39,25 @@ export default function CropAdvisor() {
   // Navigation states: 'form' | 'loading' | 'crop_result' | 'fert_result'
   const [viewState, setViewState] = useState('form');
   
-  // Location States
+  // Location States - NO PRESELECTED VALUES (empty initially)
   const [statesList, setStatesList] = useState([]);
   const [districtsList, setDistrictsList] = useState([]);
-  const [selectedState, setSelectedState] = useState('Maharashtra');
-  const [selectedDistrict, setSelectedDistrict] = useState('Akola');
+  const [selectedState, setSelectedState] = useState('');
+  const [selectedDistrict, setSelectedDistrict] = useState('');
 
-  // Field Condition States
-  const [waterAvailability, setWaterAvailability] = useState('medium');
-  const [soilType, setSoilType] = useState('loamy');
-  const [previousCrop, setPreviousCrop] = useState('Wheat');
+  // Regional crops for selected location
+  const [regionalCrops, setRegionalCrops] = useState([]);
+  const [loadingRegionalCrops, setLoadingRegionalCrops] = useState(false);
+
+  // Field Condition States - NO PRESELECTED VALUES (empty initially)
+  const [waterAvailability, setWaterAvailability] = useState('');
+  const [soilType, setSoilType] = useState('');
+  const [previousCrop, setPreviousCrop] = useState('');
   const [cropList, setCropList] = useState([]);
+
+  // Validation & Error States
+  const [fieldErrors, setFieldErrors] = useState({});
+  const [errorMsg, setErrorMsg] = useState(null);
 
   // Result data
   const [locationMeta, setLocationMeta] = useState(null);
@@ -57,17 +65,13 @@ export default function CropAdvisor() {
   const [selectedCropIndex, setSelectedCropIndex] = useState(0);
   const [fertResult, setFertResult] = useState(null);
   const [saveStatus, setSaveStatus] = useState(null); // null | 'saved' | 'error'
-  const [errorMsg, setErrorMsg] = useState(null);
 
-  // Load States list on mount
+  // Load States list on mount (do not select anything automatically)
   useEffect(() => {
     async function loadStates() {
       try {
         const states = await api.getStates();
         setStatesList(states);
-        if (states.length > 0 && !states.includes(selectedState)) {
-          setSelectedState(states[0]);
-        }
       } catch (err) {
         console.error('Error fetching states:', err);
       }
@@ -78,15 +82,17 @@ export default function CropAdvisor() {
   // Load Districts whenever selectedState changes
   useEffect(() => {
     async function loadDistricts() {
-      if (!selectedState) return;
+      if (!selectedState) {
+        setDistrictsList([]);
+        setSelectedDistrict('');
+        setRegionalCrops([]);
+        return;
+      }
       try {
         const districts = await api.getDistricts(selectedState);
         setDistrictsList(districts);
-        if (districts.length > 0) {
-          if (!districts.includes(selectedDistrict)) {
-            setSelectedDistrict(districts[0]);
-          }
-        }
+        setSelectedDistrict(''); // reset district selection when state changes
+        setRegionalCrops([]);
       } catch (err) {
         console.error('Error fetching districts:', err);
       }
@@ -94,7 +100,7 @@ export default function CropAdvisor() {
     loadDistricts();
   }, [selectedState]);
 
-  // Load generic crop options for previous crop selector
+  // Load generic crop options for previous crop selector (do not select anything automatically)
   useEffect(() => {
     async function loadCrops() {
       try {
@@ -107,23 +113,147 @@ export default function CropAdvisor() {
     loadCrops();
   }, []);
 
+  // Compute other crops dynamically: All Available Crops - Regional Crops = Other Crops
+  const otherCrops = useMemo(() => {
+    const regionalLower = new Set(regionalCrops.map(c => c.toLowerCase().trim()));
+    return cropList.filter(c => !regionalLower.has(c.toLowerCase().trim()));
+  }, [cropList, regionalCrops]);
+
+  const isCommonCropSelected = (cropName) => {
+    return previousCrop && previousCrop.toLowerCase().trim() === cropName.toLowerCase().trim();
+  };
+
+  const isOtherCropSelected = useMemo(() => {
+    if (!previousCrop) return false;
+    const isRegional = regionalCrops.some(c => c.toLowerCase().trim() === previousCrop.toLowerCase().trim());
+    return !isRegional;
+  }, [previousCrop, regionalCrops]);
+
+  const handleStateChange = (e) => {
+    const val = e.target.value;
+    setSelectedState(val);
+    setSelectedDistrict('');
+    setDistrictsList([]);
+    setRegionalCrops([]);
+    setPreviousCrop('');
+    if (fieldErrors.state) {
+      setFieldErrors(prev => ({ ...prev, state: '' }));
+    }
+    if (fieldErrors.district) {
+      setFieldErrors(prev => ({ ...prev, district: '' }));
+    }
+    if (fieldErrors.previousCrop) {
+      setFieldErrors(prev => ({ ...prev, previousCrop: '' }));
+    }
+    if (errorMsg) setErrorMsg(null);
+  };
+
+  const handleDistrictChange = async (e) => {
+    const val = e.target.value;
+    setSelectedDistrict(val);
+    setPreviousCrop('');
+    setRegionalCrops([]);
+    if (fieldErrors.district) {
+      setFieldErrors(prev => ({ ...prev, district: '' }));
+    }
+    if (fieldErrors.previousCrop) {
+      setFieldErrors(prev => ({ ...prev, previousCrop: '' }));
+    }
+    if (errorMsg) setErrorMsg(null);
+
+    if (val && selectedState) {
+      setLoadingRegionalCrops(true);
+      try {
+        const crops = await api.getLocationCrops(selectedState, val);
+        setRegionalCrops(crops || []);
+      } catch (err) {
+        console.error('Error fetching regional crops:', err);
+        setRegionalCrops([]);
+      } finally {
+        setLoadingRegionalCrops(false);
+      }
+    }
+  };
+
+  const handleWaterSelect = (val) => {
+    setWaterAvailability(val);
+    if (fieldErrors.water) {
+      setFieldErrors(prev => ({ ...prev, water: '' }));
+    }
+    if (errorMsg) setErrorMsg(null);
+  };
+
+  const handleSoilSelect = (val) => {
+    setSoilType(val);
+    if (fieldErrors.soil) {
+      setFieldErrors(prev => ({ ...prev, soil: '' }));
+    }
+    if (errorMsg) setErrorMsg(null);
+  };
+
+  const handleSelectRegionalCrop = (crop) => {
+    setPreviousCrop(crop);
+    if (fieldErrors.previousCrop) {
+      setFieldErrors(prev => ({ ...prev, previousCrop: '' }));
+    }
+    if (errorMsg) setErrorMsg(null);
+  };
+
+  const handleSelectOtherCrop = (e) => {
+    const val = e.target.value;
+    setPreviousCrop(val);
+    if (fieldErrors.previousCrop) {
+      setFieldErrors(prev => ({ ...prev, previousCrop: '' }));
+    }
+    if (errorMsg) setErrorMsg(null);
+  };
+
   const handleReset = () => {
-    setSelectedState('Maharashtra');
-    setSelectedDistrict('Akola');
-    setWaterAvailability('medium');
-    setSoilType('loamy');
-    setPreviousCrop('Wheat');
+    setSelectedState('');
+    setSelectedDistrict('');
+    setDistrictsList([]);
+    setRegionalCrops([]);
+    setWaterAvailability('');
+    setSoilType('');
+    setPreviousCrop('');
+    setFieldErrors({});
+    setErrorMsg(null);
     setLocationMeta(null);
     setRecommendations([]);
     setSelectedCropIndex(0);
     setFertResult(null);
-    setErrorMsg(null);
     setSaveStatus(null);
     setViewState('form');
   };
 
   const handleSubmitForm = async (e) => {
     if (e) e.preventDefault();
+    
+    // Strict client-side validation
+    const errors = {};
+    if (!selectedState) {
+      errors.state = "Please select your state.";
+    }
+    if (!selectedDistrict) {
+      errors.district = "Please select your district.";
+    }
+    if (!waterAvailability) {
+      errors.water = "Please select water availability.";
+    }
+    if (!soilType) {
+      errors.soil = "Please select soil type.";
+    }
+    if (!previousCrop) {
+      errors.previousCrop = "Please select your previous crop.";
+    }
+
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors);
+      setErrorMsg("Please complete all field information before getting a recommendation.");
+      return;
+    }
+
+    setFieldErrors({});
     setErrorMsg(null);
     setViewState('loading');
 
@@ -234,7 +364,7 @@ export default function CropAdvisor() {
   };
 
   const getLocationBadgeText = () => {
-    if (!locationMeta) return `Supported in ${selectedDistrict}`;
+    if (!locationMeta) return `Supported in ${selectedDistrict || 'selected location'}`;
     if (locationMeta.match_level === 'district') {
       return `✓ Supported in ${locationMeta.district}`;
     } else if (locationMeta.match_level === 'state') {
@@ -271,11 +401,11 @@ export default function CropAdvisor() {
           <div className="page-header">
             <h1 className="page-title">Find the right crop for your field</h1>
             <p className="page-subtitle">
-              Enter your location, water availability, soil type, and previous crop for a personalized, data-backed recommendation.
+              Enter your location, water availability, soil type, and previous crop to receive an ML-backed recommendation.
             </p>
           </div>
 
-          <form onSubmit={handleSubmitForm}>
+          <form onSubmit={handleSubmitForm} noValidate>
             
             {/* 1. LOCATION SECTION */}
             <div className="form-group">
@@ -287,38 +417,55 @@ export default function CropAdvisor() {
               <div className="form-grid-2">
                 <div>
                   <label htmlFor="stateSelect" style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)', marginBottom: '4px', display: 'block' }}>
-                    State / Region
+                    State / Region <span style={{ color: 'var(--color-error)' }}>*</span>
                   </label>
                   <select
                     id="stateSelect"
-                    className="form-select"
+                    className={`form-select ${fieldErrors.state ? 'error' : ''}`}
                     value={selectedState}
-                    onChange={(e) => setSelectedState(e.target.value)}
+                    onChange={handleStateChange}
                   >
+                    <option value="">Select state / region</option>
                     {statesList.map((st) => (
                       <option key={st} value={st}>
                         {st}
                       </option>
                     ))}
                   </select>
+                  {fieldErrors.state && (
+                    <div className="field-error-text">
+                      <AlertCircle size={13} />
+                      <span>{fieldErrors.state}</span>
+                    </div>
+                  )}
                 </div>
 
                 <div>
                   <label htmlFor="districtSelect" style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)', marginBottom: '4px', display: 'block' }}>
-                    District / Location
+                    District / Location <span style={{ color: 'var(--color-error)' }}>*</span>
                   </label>
                   <select
                     id="districtSelect"
-                    className="form-select"
+                    className={`form-select ${fieldErrors.district ? 'error' : ''}`}
                     value={selectedDistrict}
-                    onChange={(e) => setSelectedDistrict(e.target.value)}
+                    onChange={handleDistrictChange}
+                    disabled={!selectedState}
                   >
+                    <option value="">
+                      {!selectedState ? "Select state first" : "Select district / location"}
+                    </option>
                     {districtsList.map((dst) => (
                       <option key={dst} value={dst}>
                         {dst}
                       </option>
                     ))}
                   </select>
+                  {fieldErrors.district && (
+                    <div className="field-error-text">
+                      <AlertCircle size={13} />
+                      <span>{fieldErrors.district}</span>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -327,14 +474,17 @@ export default function CropAdvisor() {
             <div className="form-group">
               <label className="form-label" style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
                 <Droplets size={17} color="var(--color-primary)" />
-                <span>2. Water Availability</span>
+                <span>2. Water Availability <span style={{ color: 'var(--color-error)' }}>*</span></span>
               </label>
-              <div className="form-radio-grid">
+              <div className={`form-radio-grid ${fieldErrors.water ? 'error-grid' : ''}`}>
                 {WATER_OPTIONS.map((opt) => (
                   <div
                     key={opt.id}
                     className={`radio-card ${waterAvailability === opt.id ? 'selected' : ''}`}
-                    onClick={() => setWaterAvailability(opt.id)}
+                    onClick={() => handleWaterSelect(opt.id)}
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') handleWaterSelect(opt.id); }}
                   >
                     <div className="radio-card-title">{opt.label}</div>
                     <div style={{ fontSize: '0.775rem', color: 'var(--color-text-muted)', marginTop: '2px' }}>
@@ -343,44 +493,145 @@ export default function CropAdvisor() {
                   </div>
                 ))}
               </div>
+              {fieldErrors.water && (
+                <div className="field-error-text">
+                  <AlertCircle size={13} />
+                  <span>{fieldErrors.water}</span>
+                </div>
+              )}
             </div>
 
+            {/* 3. SOIL TYPE */}
             <div className="form-group">
               <label className="form-label" style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
                 <Layers size={17} color="var(--color-primary)" />
-                <span>Soil Type</span>
+                <span>3. Soil Type <span style={{ color: 'var(--color-error)' }}>*</span></span>
               </label>
-              <div className="form-radio-grid">
+              <div className={`form-radio-grid ${fieldErrors.soil ? 'error-grid' : ''}`}>
                 {SOIL_OPTIONS.map((opt) => (
                   <div
                     key={opt.id}
                     className={`radio-card ${soilType === opt.id ? 'selected' : ''}`}
-                    onClick={() => setSoilType(opt.id)}
+                    onClick={() => handleSoilSelect(opt.id)}
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') handleSoilSelect(opt.id); }}
                   >
                     <div className="radio-card-title">{opt.label}</div>
                   </div>
                 ))}
               </div>
+              {fieldErrors.soil && (
+                <div className="field-error-text">
+                  <AlertCircle size={13} />
+                  <span>{fieldErrors.soil}</span>
+                </div>
+              )}
             </div>
 
-            {/* 3. CROP ROTATION (Previous Crop) */}
+            {/* 4. PREVIOUS CROP */}
             <div className="form-group">
-              <label htmlFor="previousCropSelect" className="form-label" style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                <RotateCcw size={17} color="var(--color-primary)" />
-                <span>3. Previous Crop</span>
+              <label className="form-label" style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginBottom: '0.2rem' }}>
+                <Sprout size={17} color="var(--color-primary)" />
+                <span>4. Previous Crop <span style={{ color: 'var(--color-error)' }}>*</span></span>
               </label>
-              <select
-                id="previousCropSelect"
-                className="form-select"
-                value={previousCrop}
-                onChange={(e) => setPreviousCrop(e.target.value)}
-              >
-                {cropList.map((crop) => (
-                  <option key={crop} value={crop}>
-                    {crop}
-                  </option>
-                ))}
-              </select>
+              <div style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', marginBottom: '0.85rem' }}>
+                Select the crop you grew in the previous season.
+              </div>
+
+              {!selectedDistrict ? (
+                <div className={`previous-crop-empty-state ${fieldErrors.previousCrop ? 'error-border' : ''}`}>
+                  <Info size={18} color="var(--color-primary)" />
+                  <span>Select a district to see common crops.</span>
+                </div>
+              ) : loadingRegionalCrops ? (
+                <div className="previous-crop-empty-state">
+                  <div className="spinner-sm"></div>
+                  <span>Loading common crops...</span>
+                </div>
+              ) : (
+                <div className={`previous-crop-panel ${fieldErrors.previousCrop && !previousCrop ? 'error-border' : ''}`}>
+                  {regionalCrops.length > 0 ? (
+                    <>
+                      {/* Regional crops header banner */}
+                      <div className="regional-crops-banner">
+                        <div className="regional-badge-icon">
+                          <Sparkles size={16} />
+                        </div>
+                        <div>
+                          <div className="regional-crops-heading">
+                            Common crops in {selectedDistrict}
+                          </div>
+                          <div className="regional-crops-subtext">
+                            Based on our regional dataset for {selectedDistrict}, {selectedState}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Selectable button cards */}
+                      <div className="regional-crop-grid">
+                        {regionalCrops.map((crop) => {
+                          const isSelected = isCommonCropSelected(crop);
+                          return (
+                            <div
+                              key={crop}
+                              className={`regional-crop-btn ${isSelected ? 'selected' : ''}`}
+                              onClick={() => handleSelectRegionalCrop(crop)}
+                              role="button"
+                              tabIndex={0}
+                              onKeyDown={(e) => {
+                                if (e.key === 'Enter' || e.key === ' ') {
+                                  e.preventDefault();
+                                  handleSelectRegionalCrop(crop);
+                                }
+                              }}
+                            >
+                              {isSelected && <Check size={14} className="crop-check-icon" />}
+                              <span>{crop}</span>
+                            </div>
+                          );
+                        })}
+                      </div>
+
+                      {/* Divider */}
+                      <div className="crop-or-divider">
+                        <span>OR</span>
+                      </div>
+                    </>
+                  ) : (
+                    <div style={{ fontSize: '0.9rem', color: 'var(--color-text-muted)', marginBottom: '1rem', fontStyle: 'italic' }}>
+                      No regional crop information is available for this location.
+                    </div>
+                  )}
+
+                  {/* Other crops dropdown */}
+                  <div className="other-crops-group">
+                    <label htmlFor="otherCropSelect" style={{ fontSize: '0.825rem', fontWeight: 600, color: 'var(--color-text-muted)', marginBottom: '6px', display: 'block' }}>
+                      Other crops
+                    </label>
+                    <select
+                      id="otherCropSelect"
+                      className={`form-select ${fieldErrors.previousCrop && !previousCrop ? 'error' : ''}`}
+                      value={isOtherCropSelected ? previousCrop : ''}
+                      onChange={handleSelectOtherCrop}
+                    >
+                      <option value="">Select from other crops</option>
+                      {otherCrops.map((crop) => (
+                        <option key={crop} value={crop}>
+                          {crop}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+              )}
+
+              {fieldErrors.previousCrop && (
+                <div className="field-error-text">
+                  <AlertCircle size={13} />
+                  <span>{fieldErrors.previousCrop}</span>
+                </div>
+              )}
             </div>
 
             {/* Actions */}

@@ -49,16 +49,11 @@ class CropService:
             print(f"Crop model not found at {MODEL_PATH}")
 
     def get_available_crops(self) -> List[str]:
-        """Returns capitalized list of available crops for dropdowns and reference."""
-        standard_list = [
-            "Rice", "Wheat", "Maize", "Soybean", "Cotton", "Sugarcane", 
-            "Chickpea", "Kidney Beans", "Pigeon Peas (Tur)", "Moth Beans", "Mung Bean", 
-            "Black Gram (Urad)", "Lentil (Masoor)", "Pomegranate", "Banana", "Mango", 
-            "Grapes", "Watermelon", "Muskmelon", "Apple", "Orange", 
-            "Papaya", "Coconut", "Jute", "Coffee", "Jowar (Sorghum)", "Bajra (Pearl Millet)",
-            "Groundnut", "Mustard", "Pulses", "Vegetables", "Other", "Unknown"
-        ]
-        return standard_list
+        """Returns sorted capitalized list of available crops for dropdowns and reference."""
+        crops = sorted(list(set(DISPLAY_NAMES.values())))
+        if "Other" not in crops:
+            crops.append("Other")
+        return crops
 
     def _compute_condition_similarity(
         self,
