@@ -4,44 +4,48 @@
    ========================================================================== */
 
 :root {
-  /* Light Mode Palette (Default) */
-  --color-primary: #1B4332;
-  --color-primary-hover: #163A2B;
+  /* Light Mode Palette — Rich Earthy Brown & Warm Farmland Tones */
+  --color-primary: #3E2723;
+  --color-primary-hover: #27160B;
   --color-primary-btn-text: #FFFFFF;
-  --color-secondary-green: #40916C;
-  --color-light-green: #D8F3DC;
-  --color-very-light-green: #F1F8F3;
+  --color-secondary-green: #8D5B2D;
+  --color-light-green: #EDE0D4;
+  --color-very-light-green: #F5EBE0;
 
-  --color-bg: #F7F8F5;
-  --color-surface: #FFFFFF;
-  --color-surface-elevated: #FFFFFF;
-  --color-surface-subtle: #F1F8F3;
+  --color-bg: #F3EFE7;
+  --color-bg-overlay: rgba(243, 239, 231, 0.45);
+  --color-surface: rgba(250, 248, 243, 0.90);
+  --color-surface-elevated: rgba(250, 248, 243, 0.96);
+  --color-surface-subtle: rgba(237, 231, 220, 0.88);
 
-  --color-text-main: #1E293B;
-  --color-text-muted: #64748B;
-  --color-text-light: #94A3B8;
+  --color-text-main: #2E1C14;
+  --color-text-muted: #6D594F;
+  --color-text-light: #9C897E;
 
-  --color-border: #DDE5DF;
-  --color-border-hover: #B7C7BD;
+  --color-border: #D7CCC8;
+  --color-border-hover: #BCAAA4;
 
-  --color-amber: #D97706;
-  --color-amber-light: #FEF3C7;
-  --color-amber-text: #92400E;
+  --color-earth: #8D5B2D;
+  --color-earth-light: #EFEBE9;
 
-  --color-success: #2E7D32;
-  --color-success-bg: #D8F3DC;
-  --color-success-text: #1B4332;
+  --color-amber: #C47A20;
+  --color-amber-light: #F9EEDD;
+  --color-amber-text: #8A5212;
+
+  --color-success: #4E342E;
+  --color-success-bg: #EDE0D4;
+  --color-success-text: #3E2723;
 
   --color-error: #C62828;
-  --color-error-bg: #FEE2E2;
+  --color-error-bg: #FDE8E8;
   --color-error-text: #991B1B;
 
   --font-heading: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
   --font-body: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
 
-  --shadow-sm: 0 1px 3px rgba(27, 67, 50, 0.05);
-  --shadow-md: 0 4px 6px -1px rgba(27, 67, 50, 0.07), 0 2px 4px -2px rgba(27, 67, 50, 0.04);
-  --shadow-lg: 0 10px 15px -3px rgba(27, 67, 50, 0.08), 0 4px 6px -4px rgba(27, 67, 50, 0.04);
+  --shadow-sm: 0 1px 3px rgba(62, 39, 35, 0.06);
+  --shadow-md: 0 4px 6px -1px rgba(62, 39, 35, 0.08), 0 2px 4px -2px rgba(62, 39, 35, 0.04);
+  --shadow-lg: 0 10px 15px -3px rgba(62, 39, 35, 0.10), 0 4px 6px -4px rgba(62, 39, 35, 0.05);
 
   --radius-sm: 6px;
   --radius-md: 10px;
@@ -63,9 +67,10 @@
   --color-very-light-green: #16231C;
 
   --color-bg: #0F1713;
-  --color-surface: #16231C;
+  --color-bg-overlay: rgba(15, 23, 19, 0.88);
+  --color-surface: rgba(22, 35, 28, 0.94);
   --color-surface-elevated: #1D2E25;
-  --color-surface-subtle: #1D2E25;
+  --color-surface-subtle: rgba(29, 46, 37, 0.92);
 
   --color-text-main: #F1F5F3;
   --color-text-muted: #B7C4BD;
@@ -101,6 +106,11 @@
 body {
   font-family: var(--font-body);
   background-color: var(--color-bg);
+  background-image: linear-gradient(var(--color-bg-overlay), var(--color-bg-overlay)), url('/cropmitra-rice-field.jpg');
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
   color: var(--color-text-main);
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
@@ -160,6 +170,8 @@ button, input, select, textarea {
 /* Navbar */
 .navbar {
   background-color: var(--color-surface);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   border-bottom: 1px solid var(--color-border);
   position: sticky;
   top: 0;
@@ -465,6 +477,8 @@ button, input, select, textarea {
 /* Cards & Headers */
 .card {
   background-color: var(--color-surface);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
   padding: 2rem;
@@ -1053,6 +1067,8 @@ button, input, select, textarea {
 
 .guide-card {
   background-color: var(--color-surface);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
   padding: 1.5rem;
@@ -1087,6 +1103,8 @@ button, input, select, textarea {
 
 .modal-content {
   background-color: var(--color-surface);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
   max-width: 600px;
@@ -1113,6 +1131,8 @@ button, input, select, textarea {
 /* Footer */
 .footer {
   background-color: var(--color-surface);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   border-top: 1px solid var(--color-border);
   padding: 2rem 0;
   text-align: center;
@@ -1147,6 +1167,7 @@ button, input, select, textarea {
 @media print {
   body {
     background-color: #FFFFFF !important;
+    background-image: none !important;
     color: #000000 !important;
     font-size: 11pt !important;
   }
