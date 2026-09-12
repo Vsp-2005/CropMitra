@@ -1,0 +1,126 @@
+{
+  "accuracy": 0.156875,
+  "fertilizer_types": [
+    "Urea",
+    "DAP",
+    "14-35-14",
+    "28-28",
+    "17-17-17",
+    "20-20",
+    "10-26-26"
+  ],
+  "soil_types": [
+    "Sandy",
+    "Loamy",
+    "Black",
+    "Red",
+    "Clayey"
+  ],
+  "crop_types": [
+    "Maize",
+    "Sugarcane",
+    "Cotton",
+    "Tobacco",
+    "Paddy",
+    "Barley",
+    "Wheat",
+    "Millets",
+    "Oil seeds",
+    "Pulses",
+    "Ground Nuts"
+  ],
+  "guidelines": {
+    "Urea": {
+      "full_name": "Urea (46-0-0)",
+      "npk_ratio": "46% Nitrogen, 0% Phosphorus, 0% Potassium",
+      "guidance": "High nitrogen source. Apply in split doses (e.g., basal and top-dressing during active vegetative growth). Avoid applying immediately before heavy rain to prevent leaching."
+    },
+    "DAP": {
+      "full_name": "Di-Ammonium Phosphate (18-46-0)",
+      "npk_ratio": "18% Nitrogen, 46% Phosphorus, 0% Potassium",
+      "guidance": "Primary source of root-promoting phosphorus and starter nitrogen. Best applied at sowing or basal stage near the root zone."
+    },
+    "14-35-14": {
+      "full_name": "NPK Complex (14-35-14)",
+      "npk_ratio": "14% Nitrogen, 35% Phosphorus, 14% Potassium",
+      "guidance": "High-phosphorus balanced complex. Suitable for pulse, oilseed, and root crops needing early root establishment and strong stalk formation."
+    },
+    "28-28": {
+      "full_name": "NPK Complex (28-28-0)",
+      "npk_ratio": "28% Nitrogen, 28% Phosphorus, 0% Potassium",
+      "guidance": "Balanced nitrogen and phosphorus formula for vegetative growth and tillering in cereal crops."
+    },
+    "17-17-17": {
+      "full_name": "Complete Balanced NPK (17-17-17)",
+      "npk_ratio": "17% Nitrogen, 17% Phosphorus, 17% Potassium",
+      "guidance": "Equal-ratio complete fertilizer. Suitable across diverse soil types for balanced leaf growth, flowering, and drought resistance."
+    },
+    "20-20": {
+      "full_name": "Ammonium Phosphate Sulphate (20-20-0-13)",
+      "npk_ratio": "20% Nitrogen, 20% Phosphorus, 0% Potassium + Sulphur",
+      "guidance": "Supplies nitrogen, phosphorus, and essential sulphur. Highly beneficial for oilseeds, pulses, and cruciferous crops."
+    },
+    "10-26-26": {
+      "full_name": "High Potassium NPK (10-26-26)",
+      "npk_ratio": "10% Nitrogen, 26% Phosphorus, 26% Potassium",
+      "guidance": "High potassium and phosphorus ratio. Promotes fruit/grain development, root strength, and pest/disease resistance."
+    }
+  },
+  "crop_nutrients": {
+    "Barley": {
+      "Nitrogen": 17.9,
+      "Phosphorous": 19.0,
+      "Potassium": 4.0
+    },
+    "Cotton": {
+      "Nitrogen": 18.0,
+      "Phosphorous": 19.0,
+      "Potassium": 3.9
+    },
+    "Ground Nuts": {
+      "Nitrogen": 18.3,
+      "Phosphorous": 18.5,
+      "Potassium": 4.2
+    },
+    "Maize": {
+      "Nitrogen": 18.9,
+      "Phosphorous": 17.8,
+      "Potassium": 4.1
+    },
+    "Millets": {
+      "Nitrogen": 19.2,
+      "Phosphorous": 17.8,
+      "Potassium": 3.5
+    },
+    "Oil seeds": {
+      "Nitrogen": 18.4,
+      "Phosphorous": 17.7,
+      "Potassium": 4.3
+    },
+    "Paddy": {
+      "Nitrogen": 18.5,
+      "Phosphorous": 18.7,
+      "Potassium": 3.9
+    },
+    "Pulses": {
+      "Nitrogen": 18.1,
+      "Phosphorous": 18.9,
+      "Potassium": 3.9
+    },
+    "Sugarcane": {
+      "Nitrogen": 18.8,
+      "Phosphorous": 18.5,
+      "Potassium": 3.7
+    },
+    "Tobacco": {
+      "Nitrogen": 18.6,
+      "Phosphorous": 18.7,
+      "Potassium": 3.8
+    },
+    "Wheat": {
+      "Nitrogen": 18.1,
+      "Phosphorous": 19.0,
+      "Potassium": 3.8
+    }
+  }
+}
