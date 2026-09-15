@@ -763,6 +763,41 @@ export default function CropAdvisor() {
             <p className="explanation-body">{currentCrop.reason}</p>
           </div>
 
+          {/* Compact Crop Rotation Section */}
+          <div className="rotation-card">
+            <div className="rotation-card-header">
+              <span className="rotation-card-badge">CROP ROTATION</span>
+            </div>
+            <div className="rotation-grid">
+              <div className="rotation-metric">
+                <div className="meta-label">Previous crop</div>
+                <div className="meta-val">{currentCrop.previous_crop}</div>
+              </div>
+              <div className="rotation-metric">
+                <div className="meta-label">Compatibility</div>
+                <div className="meta-val">
+                  <span className={`rotation-pill ${currentCrop.rotation_compatibility?.toLowerCase() || 'neutral'}`}>
+                    {currentCrop.rotation_compatibility || 'Neutral'}
+                  </span>
+                </div>
+              </div>
+              <div className="rotation-metric">
+                <div className="meta-label">Recommendation</div>
+                <div className="meta-val">
+                  <span className={`rotation-pill ${currentCrop.rotation_recommendation?.toLowerCase() || 'consider'}`}>
+                    {currentCrop.rotation_recommendation || 'Consider'}
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div className="rotation-reason-box">
+              <span className="rotation-why-label">Why?</span>
+              <p className="rotation-why-text">
+                {currentCrop.rotation_reason || `${currentCrop.crop} provides a balanced nutrient and biological sequence following ${currentCrop.previous_crop}.`}
+              </p>
+            </div>
+          </div>
+
           {/* Multiple Recommendations (Rank #2, Rank #3) */}
           {recommendations.length > 1 && (
             <div className="candidates-section no-print">

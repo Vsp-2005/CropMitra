@@ -24,8 +24,11 @@ CROP_SYNONYMS = {
     "ragi": "ragi",
     "ragi (finger millet)": "ragi",
     "finger millet": "ragi",
+    "mandua": "ragi",
     "millets": "millets",
     "millet": "millets",
+    "kodo millet": "millets",
+    "minor millets": "millets",
 
     # Pulses & Legumes
     "soybean": "soybean",
@@ -35,6 +38,7 @@ CROP_SYNONYMS = {
     "gram": "chickpea",
     "bengal gram": "chickpea",
     "kidneybeans": "kidneybeans",
+    "kidney beans": "kidneybeans",
     "rajma": "kidneybeans",
     "rajma (kidney beans)": "kidneybeans",
     "pigeonpeas": "pigeonpeas",
@@ -45,16 +49,21 @@ CROP_SYNONYMS = {
     "red gram": "pigeonpeas",
     "red gram (tur)": "pigeonpeas",
     "mothbeans": "mothbeans",
+    "moth beans": "mothbeans",
     "mungbean": "mungbean",
+    "mung bean": "mungbean",
     "moong": "mungbean",
     "green gram": "mungbean",
     "blackgram": "blackgram",
+    "black gram": "blackgram",
     "urad": "blackgram",
     "lentil": "lentil",
     "lentils": "lentil",
     "lentil (masoor)": "lentil",
     "masoor": "lentil",
     "pulses": "pulses",
+    "pea": "pulses",
+    "peas": "pulses",
 
     # Commercial & Plantation
     "cotton": "cotton",
@@ -73,8 +82,10 @@ CROP_SYNONYMS = {
     "sesame": "sesame",
     "linseed": "linseed",
     "castor": "castor",
+    "niger": "oilseeds",
+    "oilseeds": "oilseeds",
 
-    # Horticulture & Fruits
+    # Horticulture, Vegetables & Spices
     "pomegranate": "pomegranate",
     "banana": "banana",
     "mango": "mango",
@@ -86,10 +97,11 @@ CROP_SYNONYMS = {
     "apples": "apple",
     "orange": "orange",
     "oranges": "orange",
+    "citrus": "orange",
     "papaya": "papaya",
     "coconut": "coconut",
     "guava": "guava",
-    "citrus": "orange",
+    "cashew": "cashew",
     "onion": "onion",
     "potato": "potato",
     "potatoes": "potato",
@@ -97,7 +109,16 @@ CROP_SYNONYMS = {
     "tomatoes": "tomato",
     "garlic": "garlic",
     "ginger": "ginger",
-    "turmeric": "turmeric"
+    "turmeric": "turmeric",
+    "chilli": "chilli",
+    "chillies": "chilli",
+    "coriander": "spices",
+    "cumin": "spices",
+    "cardamom": "spices",
+    "pepper": "spices",
+    "spices": "spices",
+    "vegetables": "vegetables",
+    "seasonal vegetables": "vegetables"
 }
 
 DISPLAY_NAMES = {
@@ -131,33 +152,59 @@ DISPLAY_NAMES = {
     "groundnut": "Groundnut",
     "mustard": "Mustard",
     "pulses": "Pulses",
+    "ragi": "Ragi",
+    "millets": "Millets",
+    "sunflower": "Sunflower",
+    "sesame": "Sesame",
+    "linseed": "Linseed",
+    "castor": "Castor",
+    "oilseeds": "Oilseeds",
+    "rubber": "Rubber",
+    "tea": "Tea",
+    "tobacco": "Tobacco",
+    "onion": "Onion",
+    "potato": "Potato",
+    "tomato": "Tomato",
+    "garlic": "Garlic",
+    "ginger": "Ginger",
+    "turmeric": "Turmeric",
+    "chilli": "Chilli",
+    "spices": "Spices",
+    "guava": "Guava",
+    "cashew": "Cashew",
     "vegetables": "Vegetables"
 }
 
 def normalize_crop_name(name: str) -> str:
     """
     Cleans, strips punctuation, and maps a raw crop string to a canonical lower-case key.
+    Uses exact lookup and word-boundary regex matching to avoid substring false positives.
     """
     if not name:
         return ""
     clean = name.strip().lower()
     # Remove leading 'and ' if split from text
     clean = re.sub(r"^and\s+", "", clean).strip()
-    # Remove trailing dots or special characters
-    clean = clean.rstrip(".\u200b)").strip()
+    # Remove surrounding punctuation
+    clean = clean.strip(".\u200b\"'()[]").strip()
     
-    # Check exact synonym
+    # 1. Exact match
     if clean in CROP_SYNONYMS:
         return CROP_SYNONYMS[clean]
+        
+    # Check normalized with parenthetical content
+    clean_no_paren = re.sub(r"\(.*?\)", "", clean).strip()
+    if clean_no_paren in CROP_SYNONYMS:
+        return CROP_SYNONYMS[clean_no_paren]
     
-    # Substring matching
-    for syn_key, canonical in CROP_SYNONYMS.items():
-        if syn_key in clean or clean in syn_key:
-            return canonical
+    # 2. Check multi-word phrase contains (sorted by longest synonym key first)
+    for syn_key in sorted(CROP_SYNONYMS.keys(), key=len, reverse=True):
+        if len(syn_key) >= 3 and re.search(r'\b' + re.escape(syn_key) + r'\b', clean):
+            return CROP_SYNONYMS[syn_key]
             
     return clean
 
 def canonical_display_name(name: str) -> str:
     """Returns the user-friendly capitalized display name."""
     norm = normalize_crop_name(name)
-    return DISPLAY_NAMES.get(norm, name.capitalize())
+    return DISPLAY_NAMES.get(norm, name.strip().title())

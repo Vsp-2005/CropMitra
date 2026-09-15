@@ -924,7 +924,7 @@ button, input, select, textarea {
   border-bottom: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
   padding: 1.25rem;
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
 }
 
 .explanation-title {
@@ -937,6 +937,108 @@ button, input, select, textarea {
   font-size: 0.975rem;
   color: var(--color-text-main);
   line-height: 1.6;
+}
+
+/* Compact Crop Rotation Card */
+.rotation-card {
+  background-color: var(--color-surface-subtle);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.rotation-card-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.rotation-card-badge {
+  font-size: 0.8rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: var(--color-primary);
+  text-transform: uppercase;
+}
+
+.rotation-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.rotation-metric .meta-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--color-text-light);
+  margin-bottom: 0.25rem;
+}
+
+.rotation-metric .meta-val {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--color-text-main);
+}
+
+.rotation-pill {
+  display: inline-block;
+  padding: 0.2rem 0.6rem;
+  border-radius: 9999px;
+  font-size: 0.825rem;
+  font-weight: 700;
+  text-transform: capitalize;
+}
+
+.rotation-pill.high,
+.rotation-pill.prefer {
+  background-color: rgba(46, 125, 50, 0.15);
+  color: var(--color-primary);
+  border: 1px solid rgba(46, 125, 50, 0.3);
+}
+
+.rotation-pill.medium,
+.rotation-pill.consider,
+.rotation-pill.neutral {
+  background-color: rgba(217, 119, 6, 0.15);
+  color: #b45309;
+  border: 1px solid rgba(217, 119, 6, 0.3);
+}
+
+.rotation-pill.low,
+.rotation-pill.avoid {
+  background-color: rgba(198, 40, 40, 0.15);
+  color: #c62828;
+  border: 1px solid rgba(198, 40, 40, 0.3);
+}
+
+.rotation-pill.unknown {
+  background-color: rgba(100, 116, 139, 0.15);
+  color: #64748b;
+  border: 1px solid rgba(100, 116, 139, 0.3);
+}
+
+.rotation-reason-box {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.rotation-why-label {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+.rotation-why-text {
+  font-size: 0.925rem;
+  color: var(--color-text-main);
+  line-height: 1.5;
+  margin: 0;
 }
 
 /* Ranked Candidates List */

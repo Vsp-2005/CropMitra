@@ -63,6 +63,11 @@ class CropRecommendRequest(BaseModel):
 class CropRecommendationDetail(BaseModel):
     crop: str
     ml_score: float
+    condition_score: Optional[float] = None
+    rotation_score: Optional[float] = None
+    rotation_compatibility: Optional[str] = "Neutral"
+    rotation_recommendation: Optional[str] = "Consider"
+    rotation_reason: Optional[str] = None
     final_score: float
     suitability: str
     location_supported: bool = True
